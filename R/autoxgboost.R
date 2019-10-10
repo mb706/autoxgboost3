@@ -1,8 +1,8 @@
 
-#' @title Fit and optimize a xgboost model.
+#' @title Get an xgboost Search Space and Learner
 #'
 #' @description
-#' An xgboost model and ParamSet is created that emulates autoxgboost.
+#' An xgboost Learner and ParamSet is created that emulates autoxgboost.
 #'
 #' @param task\cr
 #'   The task.
@@ -33,7 +33,7 @@
 #'   while a more exact approach would be to apply it only to the training set (emulate_exactly==FALSE).
 #' @return \code{something}.
 #' @export
-autoxgboost = function(task, par.set = "unmixed", predict.type = "response",
+autoxgboost_space = function(task, par.set = "unmixed", predict.type = "response",
   max.nrounds = 1e6, early.stopping.rounds = 10, early.stopping.fraction = 4/5,
   impact.encoding.boundary = 10, nthread = NULL, tune.threshold = TRUE, emulate_exactly = TRUE) {
 
@@ -53,68 +53,68 @@ autoxgboost = function(task, par.set = "unmixed", predict.type = "response",
   }
 
   autoxgbparset = ParamSet$new(list(
-    ParamDbl$new("eta", 0.01, 0.2),
-    ParamDbl$new("gamma", -7, 6),
-    ParamInt$new("max_depth", 3, 20),
-    ParamDbl$new("colsample_bytree", 0.5, 1),
-    ParamDbl$new("colsample_bylevel", 0.5, 1),
-    ParamDbl$new("lambda", -10, 10),
-    ParamDbl$new("alpha", -10, 10),
-    ParamDbl$new("subsample", 0.5, 1)
+    ParamDbl$new("xgboost.eta", 0.01, 0.2),
+    ParamDbl$new("xgboost.gamma", -7, 6),
+    ParamInt$new("xgboost.max_depth", 3, 20),
+    ParamDbl$new("xgboost.colsample_bytree", 0.5, 1),
+    ParamDbl$new("xgboost.colsample_bylevel", 0.5, 1),
+    ParamDbl$new("xgboost.lambda", -10, 10),
+    ParamDbl$new("xgboost.alpha", -10, 10),
+    ParamDbl$new("xgboost.subsample", 0.5, 1)
   ))
 
   autoxgbparset.mixed = autoxgbparset$clone(deep = TRUE)
 
   lapply(list(
-    ParamFct$new("booster", c("gbtree", "gblinear", "dart")),
-    ParamFct$new("sampler_type", c("uniform", "weighted")),
-    ParamFct$new("normalize_type", c("tree", "forest")),
-    ParamDbl$new("rate_drop", 0, 1),
-    ParamDbl$new("skip_drop", 0, 1),
-    ParamLgl$new("one_drop"),
-    ParamFct$new("grow_policy", c("depthwise", "lossguide")),
-    ParamInt$new("max_leaves", 0, 8),
-    ParamInt$new("max_bin", 2, 9),
+    ParamFct$new("xgboost.booster", c("gbtree", "gblinear", "dart")),
+    ParamFct$new("xgboost.sampler_type", c("uniform", "weighted")),
+    ParamFct$new("xgboost.normalize_type", c("tree", "forest")),
+    ParamDbl$new("xgboost.rate_drop", 0, 1),
+    ParamDbl$new("xgboost.skip_drop", 0, 1),
+    ParamLgl$new("xgboost.one_drop"),
+    ParamFct$new("xgboost.grow_policy", c("depthwise", "lossguide")),
+    ParamInt$new("xgboost.max_leaves", 0, 8),
+    ParamInt$new("xgboost.max_bin", 2, 9)
   ), autoxgbparset.mixed$add)
 
   autoxgbparset.mixed$
-    add_dep("sample_type", "booster", CondEqual$new("dart"))$
-    add_dep("normalize_type", "booster", CondEqual$new("dart"))$
-    add_dep("rate_drop", "booster", CondEqual$new("dart"))$
-    add_dep("skip_drop", "booster", CondEqual$new("dart"))$
-    add_dep("one_drop", "booster", CondEqual$new("dart"))$
-    add_dep("max_leaves", "grow_policy", CondEqual$new("lossguide"))
+    add_dep("xgboost.sampler_type", "xgboost.booster", CondEqual$new("dart"))$
+    add_dep("xgboost.normalize_type", "xgboost.booster", CondEqual$new("dart"))$
+    add_dep("xgboost.rate_drop", "xgboost.booster", CondEqual$new("dart"))$
+    add_dep("xgboost.skip_drop", "xgboost.booster", CondEqual$new("dart"))$
+    add_dep("xgboost.one_drop", "xgboost.booster", CondEqual$new("dart"))$
+    add_dep("xgboost.max_leaves", "xgboost.grow_policy", CondEqual$new("lossguide"))
 
-  parset = switch(
+  parset = switch(par.set,
       mixed = autoxgbparset.mixed,
       unmixed = autoxgbparset)
 
   parset$trafo = function(x, param_set) {
-    if (!is.null(x$max_leaves)) {
-      x$max_leaves = 2^x$max_leaves
+    if (!is.null(x$xgboost.max_leaves)) {
+      x$xgboost.max_leaves = 2^x$xgboost.max_leaves
     }
-    if (!is.null(x$max_bin)) {
-      x$max_bin = 2^x$max_bin
+    if (!is.null(x$xgboost.max_bin)) {
+      x$xgboost.max_bin = 2^x$xgboost.max_bin
     }
-    if (!is.null(scale_pos_weight)) {
-      x$scale_pos_weight = 2^x$scale_pos_weight
+    if (!is.null(x$xgboost.scale_pos_weight)) {
+      x$xgboost.scale_pos_weight = 2^x$xgboost.scale_pos_weight
     }
-    x$gamma = 2^x$gamma
-    x$lambda = 2^x$lambda
-    x$alpha = 2^x$alpha
+    x$xgboost.gamma = 2^x$xgboost.gamma
+    x$xgboost.lambda = 2^x$xgboost.lambda
+    x$xgboost.alpha = 2^x$xgboost.alpha
     x
   }
 
   if (task$task_type == "classif") {
     if ("twoclass" %in% task$properties) {
-      parset$add_param("scale_pos_weight", -10, 10)
+      parset$add_param(ParamDbl$new("xgboost.scale_pos_weight", -10, 10))
       objective = "binary:logistic"
       eval_metric = "error"
     } else {
       objective = "multi:softprob"
       eval_metric = "merror"
     }
-    xgblearner = lrn("classif.autoxgboost", eval_metric = eval_metric, objective = objective,
+    xgblearner = lrn("classif.xgboost", eval_metric = eval_metric, objective = objective,
       early_stopping_rounds = early.stopping.rounds, nrounds = max.nrounds, predict_type = predict.type)
   } else if (task$task_type == "regr") {
     if (predict.type != "response") {
@@ -122,11 +122,12 @@ autoxgboost = function(task, par.set = "unmixed", predict.type = "response",
     }
     objective = "reg:linear"
     eval_metric = "rmse"
-    xgblearner = lrn("regr.autoxgboost", eval_metric = eval_metric, objective = objective,
+    xgblearner = lrn("regr.xgboost", eval_metric = eval_metric, objective = objective,
       early_stopping_rounds = early.stopping.rounds, nrounds = max.nrounds, predict_type = predict.type)
   } else {
     stopf("Unsupported task type %s", task$task_type)
   }
+  xgblearner$id = "xgboost"
   xgblearner$param_set$values$nthread = nthread
 
   # autoxgboost is a bit weird:
