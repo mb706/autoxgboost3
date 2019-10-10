@@ -1,0 +1,21 @@
+Package: autoxgboost
+Title: Automatic tuning and fitting of xgboost
+Version: 0.0.0.9000
+Authors@R: person("Martin", "Binder", email = "mlr.developer@mb706.com", role = c("aut", "cre"))
+Description: Automatic tuning and fitting of 'xgboost'. Emulates autoxgboost for mlr3. 
+License: BSD_2_clause + file LICENSE
+Encoding: UTF-8
+LazyData: true
+Depends:
+    R (>= 3.0.2),
+    paradox,
+    mlr3,
+    mlr3pipelines,
+    mlr3learners
+Imports:
+    mlr3misc,
+    checkmate (>= 1.8.2),
+    xgboost (>= 0.6.4)
+Suggests:
+    testthat
+RoxygenNote: 6.1.1
