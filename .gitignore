@@ -8,4 +8,6 @@ xgboost.model
 test.R
 *.Rproj
 *.RData
-
+.#*
+[#]*
+*~
