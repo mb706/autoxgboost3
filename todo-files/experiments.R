@@ -33,6 +33,9 @@ for (setup in mlr3misc::transpose_list(CJ(
   tune.threshold = FALSE,
   emulate_exactly = c(FALSE, TRUE)))) {
   setup$task = tsk(setup$task)
+  if (setup$predict.type == "prob" && setup$task$task_type != "classif") {
+    next
+  }
   space <- do.call(autoxgboost_space, setup)
   designs <- c(generate_design_random(space$searchspace, 10)$transpose(),
     generate_design_random(space$searchspace.mixed, 10)$transpose())

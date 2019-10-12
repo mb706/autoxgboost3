@@ -148,6 +148,7 @@ autoxgboost_space = function(task, predict.type = "response",
   }
 
   graph = po("fixfactors") %>>%
+    po("imputesample", affect_columns = selector_type("factor")) %>>%
     po("encode", affect_columns = encodetarget) %>>%
     po("encodeimpact") %>>%
     po("removeconstants") %>>%
