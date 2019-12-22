@@ -106,8 +106,8 @@ autoxgboost_space = function(task, predict.type = "response",
   if (task$task_type == "classif") {
     if ("twoclass" %in% task$properties) {
       wparam = ParamDbl$new("xgboosts.cale_pos_weight", -10, 10)
-      autoxgbparset$add_param(wparam)
-      autoxgbparset.mixed$add_param(wparam)
+      autoxgbparset$add(wparam)
+      autoxgbparset.mixed$add(wparam)
       objective = "binary:logistic"
       eval_metric = "error"
     } else {
