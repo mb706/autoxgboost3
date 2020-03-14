@@ -67,10 +67,9 @@ autoxgboost_space = function(task, predict.type = "response",
     ParamFct$new("xgboost.sample_type", c("uniform", "weighted")),
     ParamFct$new("xgboost.normalize_type", c("tree", "forest")),
     ParamDbl$new("xgboost.rate_drop", 0, 1),
-    ParamDbl$new("xgboost.skip_drop", 0, 1)
-    # the following depends a bit on https://github.com/mlr-org/mlr3learners/issues/45
-    # although for random search they should not make a difference.
-#    ParamLgl$new("xgboost.one_drop"),  # one_drop has "almost surely" no effect; it does not exist in mlr3learners yet.
+    ParamDbl$new("xgboost.skip_drop", 0, 1),
+    ParamLgl$new("xgboost.one_drop")  # one_drop should have little effect; it does not exist in mlr3learners yet.
+    # The following are in the original auto-xgboost search space but should not be present.
 #    ParamFct$new("xgboost.grow_policy", c("depthwise", "lossguide")),  # has no effect apparently because tree_method is not 'hist'
 #    ParamInt$new("xgboost.max_leaves", 0, 8),  # has no effect apparently because tree_method is not 'hist'
 #    ParamInt$new("xgboost.max_bin", 2, 9)  # has no effect apparently because tree_method is not 'hist'
@@ -80,8 +79,8 @@ autoxgboost_space = function(task, predict.type = "response",
     add_dep("xgboost.sample_type", "xgboost.booster", CondEqual$new("dart"))$
     add_dep("xgboost.normalize_type", "xgboost.booster", CondEqual$new("dart"))$
     add_dep("xgboost.rate_drop", "xgboost.booster", CondEqual$new("dart"))$
-    add_dep("xgboost.skip_drop", "xgboost.booster", CondEqual$new("dart"))
-#    add_dep("xgboost.one_drop", "xgboost.booster", CondEqual$new("dart"))$
+    add_dep("xgboost.skip_drop", "xgboost.booster", CondEqual$new("dart"))$
+    add_dep("xgboost.one_drop", "xgboost.booster", CondEqual$new("dart"))
 #    add_dep("xgboost.max_leaves", "xgboost.grow_policy", CondEqual$new("lossguide"))
 
   trafo = function(x, param_set) {

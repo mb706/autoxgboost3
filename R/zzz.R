@@ -5,3 +5,4 @@
 #' @import checkmate
 #' @import mlr3pipelines
 
+"_PACKAGE"

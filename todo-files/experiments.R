@@ -9,6 +9,24 @@ library("data.table")
 devtools::load_all("autoxgboost3")
 
 
+# ------------------
+# seb's error
+
+library("mlr3tuning")
+task <- TaskClassif$new("abalone", readRDS("seb_error_task.rds")$data(), "Class")
+
+axgb_settings = autoxgboost_space(task, tune.threshold = FALSE)
+rsmp_inner = axgb_settings$resampling
+learner = axgb_settings$learner
+ps = axgb_settings$searchspace
+ti = TuningInstance$new(task = task, learner = learner, resampling = rsmp_inner, param_set = ps, measures = msr("classif.ce"), terminator = term("evals", n_evals = 100))
+tuner = tnr("random_search")
+tuner$tune(ti)
+
+
+
+# ------------------
+
 library("mlr3")
 
 task = tsk("iris")

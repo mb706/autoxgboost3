@@ -4,15 +4,20 @@
 \alias{autoxgboost_space}
 \title{Get an xgboost Search Space and Learner}
 \usage{
-autoxgboost_space(task, par.set = "unmixed", predict.type = "response",
-  max.nrounds = 1e+06, early.stopping.rounds = 10,
-  early.stopping.fraction = 4/5, impact.encoding.boundary = 10,
-  nthread = NULL, tune.threshold = TRUE, emulate_exactly = TRUE)
+autoxgboost_space(
+  task,
+  predict.type = "response",
+  max.nrounds = 1e+06,
+  early.stopping.rounds = 10,
+  early.stopping.fraction = 4/5,
+  impact.encoding.boundary = 10,
+  nthread = NULL,
+  tune.threshold = TRUE,
+  emulate_exactly = TRUE
+)
 }
 \arguments{
 \item{task\cr}{The task.}
-
-\item{par.set\cr}{Which paramset to use. either \dQuote{unmixed} (default) or \dQuote{mixed} (larger parameter set) but with param dependencies.}
 
 \item{predict.type\cr}{Predict type. One of \dQuote{prob}, \dQuote{response} (default). Only \dQuote{response} supported for regression tasks.}
 
@@ -21,7 +26,7 @@ autoxgboost_space(task, par.set = "unmixed", predict.type = "response",
 \item{early.stopping.rounds\cr}{After how many iterations without an improvement in the boosting OOB error should be stopped?
 Default is \code{10}.}
 
-\item{early.stopping.fraction\cr}{What fraction of the data should be used for early stopping (i.e. as a validation set).
+\item{early.stopping.fraction\cr}{What fraction of the data should be used for early stopping (i.e. as a training set). This is apparently just the holdout split for optimization.
 Default is \code{4/5}.}
 
 \item{impact.encoding.boundary\cr}{Defines the threshold on how factor variables are handled. Factors with more levels than the \code{"impact.encoding.boundary"} get impact encoded while factor variables with less or equal levels than the \code{"impact.encoding.boundary"} get dummy encoded.
